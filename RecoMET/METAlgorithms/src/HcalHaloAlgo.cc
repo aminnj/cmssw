@@ -13,6 +13,9 @@ using namespace reco;
 
 #include <iomanip>
 bool CompareTime(const HBHERecHit* x, const HBHERecHit* y ){ return x->time() < y->time() ;}
+bool CompareTowers(const CaloTower* x, const CaloTower* y ){ 
+  return x->iphi()*1000 + x->ieta() < y->iphi()*1000 + y->ieta();
+}
 
 HcalHaloAlgo::HcalHaloAlgo()
 {
@@ -22,7 +25,12 @@ HcalHaloAlgo::HcalHaloAlgo()
   NHitsThreshold = 0;
 }
 
-HcalHaloData HcalHaloAlgo::Calculate(const CaloGeometry& TheCaloGeometry, edm::Handle<HBHERecHitCollection>& TheHBHERecHits)
+HcalHaloData HcalHaloAlgo::Calculate(const CaloGeometry& TheCaloGeometry, edm::Handle<HBHERecHitCollection>& TheHBHERecHits) {
+    edm::Handle<CaloTowerCollection> TheCaloTowers;
+    return Calculate(TheCaloGeometry, TheHBHERecHits, TheCaloTowers);
+}
+
+HcalHaloData HcalHaloAlgo::Calculate(const CaloGeometry& TheCaloGeometry, edm::Handle<HBHERecHitCollection>& TheHBHERecHits, edm::Handle<CaloTowerCollection>& TheCaloTowers)
 {
   HcalHaloData TheHcalHaloData;
   
@@ -119,6 +127,34 @@ HcalHaloData HcalHaloAlgo::Calculate(const CaloGeometry& TheCaloGeometry, edm::H
 	  TheHcalHaloData.GetPhiWedges().push_back( wedge );
 	}
     }
+
+  // HE goes out to abs(ieta)==28
+  std::vector<const CaloTower*> SortedCaloTowers;
+  for(CaloTowerCollection::const_iterator tower = TheCaloTowers->begin(); tower != TheCaloTowers->end(); tower++) {
+    // don't use HF
+    if(abs(tower->ieta()) <= 29) SortedCaloTowers.push_back(&(*tower));
+  }
+
+  // Sort towers such that lowest iphi and ieta are first, highest last, and towers
+  // with same iphi value are consecutive. Then we can do everything else in one loop.
+  std::sort(SortedCaloTowers.begin(), SortedCaloTowers.end(), CompareTowers);
+
+  std::vector<std::pair<int, CaloTowerDetId> > problematicStrip;
+  for(unsigned int i = 0; i < SortedCaloTowers.size(); i++) {
+    const CaloTower* tower = SortedCaloTowers.at(i);
+    
+    int problematicCells = tower->numProblematicHcalCells();
+    std::pair<int, CaloTowerDetId> towerPair = std::make_pair(problematicCells, tower->id());
+
+    if(problematicCells > 0) problematicStrip.push_back(towerPair);
+
+    // if we are at the end of a strip (length>1) in iphi or if contiguity broken, then flush out the problematic strip vector
+    if( (problematicStrip.size() > 1) && (tower->ieta() == 29 || problematicCells == 0) ) {
+      TheHcalHaloData.GetProblematicStrips().push_back( problematicStrip );
+      problematicStrip.clear();
+    }
+  }
+
   return TheHcalHaloData;
   
 }

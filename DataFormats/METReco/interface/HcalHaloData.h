@@ -8,6 +8,8 @@
 */
 #include <vector>
 #include "DataFormats/METReco/interface/PhiWedge.h"
+#include "DataFormats/DetId/interface/DetId.h"
+#include "DataFormats/CaloTowers/interface/CaloTowerDetId.h"
 
 namespace reco {
   class HcalHaloData {
@@ -20,9 +22,14 @@ namespace reco {
     // Return collection of 5-degree Phi Wedges built from Hcal RecHits
     const std::vector<PhiWedge>& GetPhiWedges() const {return PhiWedgeCollection;}
     std::vector<PhiWedge>& GetPhiWedges()  {return PhiWedgeCollection;}
+
+    // Return collection of problematic strips (pairs of # of problematic HCAL cells and CaloTowerDetId)
+    const std::vector<std::vector<std::pair<int, CaloTowerDetId> > >& GetProblematicStrips() const {return ProblematicStripCollection;}
+    std::vector<std::vector<std::pair<int, CaloTowerDetId> > >& GetProblematicStrips()  {return ProblematicStripCollection;}
     
   private:
     std::vector<PhiWedge> PhiWedgeCollection;
+    std::vector<std::vector<std::pair<int, CaloTowerDetId> > > ProblematicStripCollection;
     
   };
 }

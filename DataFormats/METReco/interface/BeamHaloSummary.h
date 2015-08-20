@@ -17,6 +17,9 @@
 #include "DataFormats/METReco/interface/HcalHaloData.h" 
 #include "DataFormats/METReco/interface/GlobalHaloData.h" 
 
+#include "DataFormats/DetId/interface/DetId.h"
+#include "DataFormats/CaloTowers/interface/CaloTowerDetId.h"
+
 namespace reco {
   class BeamHaloInfoProducer;
   
@@ -70,6 +73,9 @@ namespace reco {
     std::vector<int>& GetGlobaliPhiSuspects() { return GlobaliPhiSuspects ;}
     const std::vector<int>& GetGlobaliPhiSuspects() const { return GlobaliPhiSuspects ;}
 
+    std::vector<std::vector<std::pair<int, CaloTowerDetId> > >& GetProblematicStrips() { return ProblematicStrips ;}
+    const std::vector<std::vector<std::pair<int, CaloTowerDetId> > >& GetProblematicStrips() const { return ProblematicStrips ;}
+
   private: 
     std::vector<char>  HcalHaloReport;
     std::vector<char>  EcalHaloReport;
@@ -79,6 +85,8 @@ namespace reco {
     std::vector<int>  HcaliPhiSuspects;
     std::vector<int>  EcaliPhiSuspects;
     std::vector<int>  GlobaliPhiSuspects;
+
+    std::vector<std::vector<std::pair<int, CaloTowerDetId> > > ProblematicStrips;
 
   };
   
