@@ -22,7 +22,7 @@ class HcalHaloFilter : public edm::EDFilter {
 
 HcalHaloFilter::HcalHaloFilter(const edm::ParameterSet & iConfig)
   : taggingMode_     (iConfig.getParameter<bool> ("taggingMode"))
-  , maxStripLength_   (iConfig.getParameter<int>("minStripLength"))
+  , maxStripLength_   (iConfig.getParameter<int>("maxStripLength"))
   , beamHaloSummaryToken_(consumes<reco::BeamHaloSummary>(edm::InputTag("BeamHaloSummary")))
 {
   produces<bool>();
