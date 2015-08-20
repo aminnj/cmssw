@@ -214,7 +214,7 @@ void BeamHaloSummaryProducer::produce(Event& iEvent, const EventSetup& iSetup)
 
 
   for( unsigned int i = 0 ; i < HcalData.GetProblematicStrips().size() ; i++ ) {
-    std::vector<std::pair<int, CaloTowerDetId> > ProblematicStrip = HcalData.GetProblematicStrips().at(i);
+    std::vector<std::pair<char, CaloTowerDetId> > ProblematicStrip = HcalData.GetProblematicStrips().at(i);
     if(ProblematicStrip.size() < (unsigned int)ProblematicStripMinLength) continue;
 
     TheBeamHaloSummary->GetProblematicStrips().push_back(ProblematicStrip);

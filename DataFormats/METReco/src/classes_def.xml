@@ -165,7 +165,7 @@
   <class name="edm::Wrapper<reco::EcalHaloData>"/>
 
   <class name="reco::HcalHaloData" ClassVersion="11">
-   <version ClassVersion="11" checksum="2004434394"/>
+   <version ClassVersion="11" checksum="1575944143"/>
   </class>
   <class name="edm::Wrapper<reco::HcalHaloData>"/>
 
@@ -180,7 +180,7 @@
   <class name="edm::Wrapper<reco::GlobalHaloData>"/>
 
   <class name="reco::BeamHaloSummary" ClassVersion="11">
-   <version ClassVersion="11" checksum="2765514463"/>
+   <version ClassVersion="11" checksum="3859184350"/>
   </class>
   <class name="edm::Wrapper<reco::BeamHaloSummary>"/>
 

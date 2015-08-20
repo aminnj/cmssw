@@ -140,16 +140,16 @@ HcalHaloData HcalHaloAlgo::Calculate(const CaloGeometry& TheCaloGeometry, edm::H
   // with same iphi value are consecutive. Then we can do everything else in one loop.
   std::sort(SortedCaloTowers.begin(), SortedCaloTowers.end(), CompareTowers);
 
-  std::vector<std::pair<int, CaloTowerDetId> > problematicStrip;
+  std::vector<std::pair<char, CaloTowerDetId> > problematicStrip;
   int prevIEta = -99, prevIPhi = -99;
-  std::pair<int, CaloTowerDetId> prevPair, towerPair;
+  std::pair<char, CaloTowerDetId> prevPair, towerPair;
   bool wasContiguous = true;
   // Loop through and store a vector of pairs (problematicCells, DetId) for each contiguous strip we find
   for(unsigned int i = 0; i < SortedCaloTowers.size(); i++) {
     const CaloTower* tower = SortedCaloTowers.at(i);
     int problematicCells = tower->numProblematicHcalCells();
 
-    towerPair = std::make_pair(problematicCells, tower->id());
+    towerPair = std::make_pair((char)problematicCells, tower->id());
 
     bool newIPhi = (tower->iphi()-1 == prevIPhi) || (i == 0);
     bool isContiguous = tower->ieta() == 1 ? tower->ieta() - 2 == prevIEta : tower->ieta() - 1 == prevIEta;
