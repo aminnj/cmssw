@@ -34,6 +34,7 @@ bool HcalHaloFilter::filter(edm::Event & iEvent, const edm::EventSetup & iSetup)
   iEvent.getByToken(beamHaloSummaryToken_ , beamHaloSummary);
 
   // DEBUG XXX
+  std::cout << __FILE__ << " " << beamHaloSummary->GetProblematicStrips().size() << std::endl;
   std::vector<std::vector<std::pair<int, CaloTowerDetId> > > probStrips = beamHaloSummary->GetProblematicStrips();
   for (unsigned int iStrip = 0; iStrip < probStrips.size(); iStrip++) {
     int numContiguousCells = 0;

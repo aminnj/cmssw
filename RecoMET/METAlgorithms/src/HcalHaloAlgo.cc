@@ -128,11 +128,12 @@ HcalHaloData HcalHaloAlgo::Calculate(const CaloGeometry& TheCaloGeometry, edm::H
 	}
     }
 
-  // HE goes out to abs(ieta)==28
+  // Don't use HF.
+  int maxAbsIEta = 29;
   std::vector<const CaloTower*> SortedCaloTowers;
   for(CaloTowerCollection::const_iterator tower = TheCaloTowers->begin(); tower != TheCaloTowers->end(); tower++) {
-    // don't use HF
-    if(abs(tower->ieta()) <= 29) SortedCaloTowers.push_back(&(*tower));
+    if(abs(tower->ieta()) <= maxAbsIEta && tower->numProblematicHcalCells() > 0)
+      SortedCaloTowers.push_back(&(*tower));
   }
 
   // Sort towers such that lowest iphi and ieta are first, highest last, and towers
@@ -140,19 +141,40 @@ HcalHaloData HcalHaloAlgo::Calculate(const CaloGeometry& TheCaloGeometry, edm::H
   std::sort(SortedCaloTowers.begin(), SortedCaloTowers.end(), CompareTowers);
 
   std::vector<std::pair<int, CaloTowerDetId> > problematicStrip;
+  int prevIEta = -99, prevIPhi = -99;
+  std::pair<int, CaloTowerDetId> prevPair, towerPair;
+  bool wasContiguous = true;
+  // Loop through and store a vector of pairs (problematicCells, DetId) for each contiguous strip we find
   for(unsigned int i = 0; i < SortedCaloTowers.size(); i++) {
     const CaloTower* tower = SortedCaloTowers.at(i);
-    
     int problematicCells = tower->numProblematicHcalCells();
-    std::pair<int, CaloTowerDetId> towerPair = std::make_pair(problematicCells, tower->id());
 
-    if(problematicCells > 0) problematicStrip.push_back(towerPair);
+    towerPair = std::make_pair(problematicCells, tower->id());
 
-    // if we are at the end of a strip (length>1) in iphi or if contiguity broken, then flush out the problematic strip vector
-    if( (problematicStrip.size() > 1) && (tower->ieta() == 29 || problematicCells == 0) ) {
-      TheHcalHaloData.GetProblematicStrips().push_back( problematicStrip );
+    bool newIPhi = (tower->iphi()-1 == prevIPhi) || (i == 0);
+    bool isContiguous = tower->ieta() == 1 ? tower->ieta() - 2 == prevIEta : tower->ieta() - 1 == prevIEta;
+
+    isContiguous = isContiguous || (tower->ieta() == -maxAbsIEta);
+    if(newIPhi) isContiguous = false;
+
+    if(!wasContiguous && isContiguous) {
+      problematicStrip.push_back(prevPair);
+      problematicStrip.push_back(towerPair);
+    }
+
+    if(wasContiguous && isContiguous) {
+      problematicStrip.push_back(towerPair);
+    }
+
+    if((wasContiguous && !isContiguous) || i == SortedCaloTowers.size()-1) { //ended the strip, so flush it
+      if(problematicStrip.size() > 2) TheHcalHaloData.GetProblematicStrips().push_back( problematicStrip );
       problematicStrip.clear();
     }
+
+    wasContiguous = isContiguous;
+    prevPair = towerPair;
+    prevIPhi = tower->iphi();
+    prevIEta = tower->ieta();
   }
 
   return TheHcalHaloData;

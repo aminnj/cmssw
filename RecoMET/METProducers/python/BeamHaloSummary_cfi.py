@@ -43,7 +43,7 @@ BeamHaloSummary = cms.EDProducer("BeamHaloSummaryProducer",
                                  t_HcalPhiWedgeConfidence = cms.double(0.9),
 
                                  # strips of problematic cells in HCAL min cut
-                                 problematicStripMinLength = cms.int32(3)
+                                 problematicStripMinLength = cms.int32(6)
                                  
                                  )
 
