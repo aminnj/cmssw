@@ -74,3 +74,36 @@ def appendCSCChamberMaskerAtHLT(process):
             
     return process
 
+
+def appendCSCChamberMaskerAtL1(process):
+
+    if hasattr(process,'cscpacker') :
+
+        print "[appendChamberMasker] : Found packer, applying filter"
+
+        process.precscpacker = process.cscpacker.clone()
+        process.packerMuonCSCDigis = CSCChamberMasker.clone()
+
+        process.packerMuonCSCDigis.stripDigiTag = cms.InputTag("simMuonCSCDigis", "MuonCSCStripDigi")
+        process.packerMuonCSCDigis.wireDigiTag = cms.InputTag("simMuonCSCDigis", "MuonCSCWireDigi") 
+        process.packerMuonCSCDigis.comparatorDigiTag = cms.InputTag("simMuonCSCDigis", "MuonCSCComparatorDigi")
+        process.packerMuonCSCDigis.rpcDigiTag = cms.InputTag("simMuonCSCDigis", "MuonCSCRPCDigi") 
+        process.packerMuonCSCDigis.alctDigiTag = cms.InputTag("simMuonCSCDigis", "MuonCSCALCTDigi") 
+        process.packerMuonCSCDigis.clctDigiTag = cms.InputTag("simMuonCSCDigis", "MuonCSCCLCTDigi") 
+
+
+        process.filteredPackerCSCDigiSequence = cms.Sequence(process.precscpacker + process.packerMuonCSCDigis)
+        process.DigiToRaw.replace(process.packerMuonCSCDigis, process.filteredPackerCSCDigiSequence)
+
+        if hasattr(process,"RandomNumberGeneratorService") :
+            process.RandomNumberGeneratorService.packerMuonCSCDigis = cms.PSet(
+                initialSeed = cms.untracked.uint32(789342)
+                )
+        else :
+            process.RandomNumberGeneratorService = cms.Service(
+                "RandomNumberGeneratorService",
+                packerMuonCSCDigis = cms.PSet(initialSeed = cms.untracked.uint32(789342))
+                )
+            
+    return process
+

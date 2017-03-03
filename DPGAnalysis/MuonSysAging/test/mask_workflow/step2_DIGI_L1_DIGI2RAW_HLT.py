@@ -116,5 +116,5 @@ process.GlobalTag.toGet = cms.VPSet(
 
 # from DPGAnalysis.MuonSysAging.DTChamberMasker_cff import *
 # appendDTChamberMaskerAtHLT(process)
-# from DPGAnalysis.MuonSysAging.CSCChamberMasker_cff import *
-# appendCSCChamberMaskerAtHLT(process)
+from DPGAnalysis.MuonSysAging.CSCChamberMasker_cff import *
+appendCSCChamberMaskerAtL1(process)
