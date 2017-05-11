@@ -12,7 +12,8 @@ enum CSCInefficiencyType
   { 
     EFF_CHAMBER=0, 
     EFF_STRIPS=1,
-    EFF_WIRES=2 
+    EFF_WIRES=2,
+    EFF_COMPARATORS=3 
   };
 
 class MuonSystemAging 
